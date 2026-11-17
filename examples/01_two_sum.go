@@ -13,7 +13,7 @@ func TwoSum(nums []int, target int)[]int{
 	return nil
 }
 
-func main() {
+func testTwoSum() {
     nums := []int{2, 7, 11, 15}
     fmt.Println("TwoSum result:", TwoSum(nums, 9)) // expect: [0 1]
 }
