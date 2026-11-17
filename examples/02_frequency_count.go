@@ -19,6 +19,3 @@ func testMajority() {
 	fmt.Println("Majority element:", majorityElement(nums))
 }
 
-func main() {
-    testMajority() 
-}
