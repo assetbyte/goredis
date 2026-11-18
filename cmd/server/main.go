@@ -2,6 +2,8 @@ package main
 import 
 ("fmt"
  "net"
+ "io"
+ "os"
 )
 
 func main() {
@@ -22,4 +24,22 @@ func main() {
 	}
 
 	defer conn.Close()
+
+
+	for { //infinite loop
+		buf := make([]byte, 1024)
+
+		//read message from client
+		_, err := conn.Read(buf) // _ amount of read bytes
+
+		if err != nil {
+			if err == io.EOF { // End Of File
+				break
+			} 
+			fmt.Println("error reading from client: ", err.Error())
+			os.Exit(1)
+
+		}
+		conn.Write([]byte("+OK\r\n"))
+	} 
 }
