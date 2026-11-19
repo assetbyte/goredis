@@ -35,6 +35,7 @@ func NewResp(rd io.Reader) *Resp {
 	return &Resp{reader: bufio.NewReader(rd)}
 }
 
+
 func (r *Resp) readLine() (line []byte, n int, err error){
 // line - read string as slice of bytes 
 // n - amount of read bytes
@@ -63,3 +64,44 @@ func (r *Resp) readInteger() (x int, n int, err error) {
 	}
 	return int(i64), n, nil
 }
+
+func (r *Resp) Read() (Value, error){
+	_type, err := r.reader.ReadByte()
+	if err != nil {
+		return Value{}, err
+	}
+
+	switch _type {
+	case ARRAY:
+		return r.readArray()
+	case BULK:
+		return r.readBulk()
+	default:
+		fmt.Printf("Unknown type: %v", string(_type))
+		return Value{}, nil
+	}
+}
+
+func (r *Resp) readArray() (Value, error) {
+	v := Value{}
+	v.typ = "array"
+
+	//read length of array
+	_len, _, err := r.readInteger()
+	if err != nil {
+		return v, err
+	}
+
+	// foreach line, parse and read the value
+	v.array = make([]Value, 0)
+	for i:=0; i < _len; i++ {
+		val, err := r.Read()
+		if err != nil {
+			return v, err
+		}
+		v.array = append(v.array, val)
+	}
+	return v, nil
+}
+
+func (r *Resp) readBulk() (Value, error)
