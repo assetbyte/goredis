@@ -1,22 +1,21 @@
-package main 
-import 
-("fmt"
- "net"
- "io"
- "os"
+package main
+
+import (
+	"fmt"
+	"net"
 )
 
 func main() {
-	fmt.Println("Listening on port 6379...")
+	fmt.Println("Listening on port :6379")
 
 	// Create a new server
-	l, err := net.Listen("tcp", ":6379") // 6379 - default Redis port 
-	if err != nil{
+	l, err := net.Listen("tcp", ":6379")
+	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	// Listen for connections 
+	// Listen for connections
 	conn, err := l.Accept()
 	if err != nil {
 		fmt.Println(err)
@@ -25,21 +24,17 @@ func main() {
 
 	defer conn.Close()
 
-	
-	for { //infinite loop
-		buf := make([]byte, 1024)
-
-		//read message from client
-		_, err := conn.Read(buf) // _ amount of read bytes
-
+	for {
+		resp := NewResp(conn)
+		value, err := resp.Read()
 		if err != nil {
-			if err == io.EOF { // End Of File
-				break
-			} 
-			fmt.Println("error reading from client: ", err.Error())
-			os.Exit(1)
-
+			fmt.Println(err)
+			return
 		}
+
+		fmt.Println(value)
+
+		// ignore request and send back a PONG
 		conn.Write([]byte("+OK\r\n"))
-	} 
+	}
 }

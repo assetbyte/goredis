@@ -31,11 +31,12 @@ type Resp struct {
 	reader *bufio.Reader
 }
 
+// NewResp wraps an io.Reader in a buffered reader to parse RESP values from a stream.
 func NewResp(rd io.Reader) *Resp {
 	return &Resp{reader: bufio.NewReader(rd)}
 }
 
-
+// readLine reads bytes from the stream until CRLF and returns the line without trailing \r\n.
 func (r *Resp) readLine() (line []byte, n int, err error){
 // line - read string as slice of bytes 
 // n - amount of read bytes
@@ -52,7 +53,7 @@ func (r *Resp) readLine() (line []byte, n int, err error){
 	}
 	return line[:len(line)-2], n, nil
 }
-
+// readInteger parses a CRLF-terminated line as a base-10 integer.
 func (r *Resp) readInteger() (x int, n int, err error) {
 	line, n, err := r.readLine()
 	if err != nil {
@@ -64,7 +65,7 @@ func (r *Resp) readInteger() (x int, n int, err error) {
 	}
 	return int(i64), n, nil
 }
-
+// Read reads the RESP type prefix and dispatches parsing to the matching type handler.
 func (r *Resp) Read() (Value, error){
 	_type, err := r.reader.ReadByte()
 	if err != nil {
@@ -118,7 +119,6 @@ func (r *Resp) readBulk() (Value, error){
 	v.bulk = string(bulk)
 	// Read the rest 
 	r.readLine()
-
 	return v, nil
 
 }
