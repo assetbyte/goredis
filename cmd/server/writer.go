@@ -16,3 +16,13 @@ func (v Value) Marshal() []byte {
 		return []byte{}
 	}
 }
+
+// STRING - const 
+func (v Value) marshalString() []byte {
+	var bytes []byte
+	bytes = append(bytes, STRING) //bytes: ['+']
+	bytes = append(bytes, v.str...) // ellipsis
+	bytes = append(bytes, '\r', '\n')
+	return bytes
+}
+
