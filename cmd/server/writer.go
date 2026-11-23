@@ -39,3 +39,20 @@ func (v Value) marshalBulk() []byte {
 	bytes = append(bytes, v.bulk...)
 	bytes = append(bytes, '\r', '\n')
 }
+
+// array format:
+// *<elements_count>\r\n<element_1_marshaled><element_2_marshaled>...
+func (v Value) marshalArray() []byte {
+	var bytes []byte
+	// ARRAY - const
+	_len := len(v.array)
+
+	bytes = append(bytes, ARRAY)
+	bytes = append(bytes, []byte(strconv.Itoa(_len))...)
+	bytes = append(bytes, '\r', '\n')
+
+	for i := 0; i < _len; i++ {
+		bytes = append(bytes, v.array[i].Marshal()...)
+	}
+	return bytes
+}
