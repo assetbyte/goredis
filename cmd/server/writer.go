@@ -1,10 +1,28 @@
 package main
 
 import (
+	"io"
 	"strconv"
-
-	"golang.org/x/tools/go/analysis/passes/appends"
 )
+
+type Writer struct {
+	writer io.Writer
+}
+
+func NewWriter(w io.Writer) *Writer {
+	return &Writer{writer: w}
+}
+
+func (w *Writer) Write(v Value) error {
+	bytes := v.Marshal()
+
+	_, err := w.writer.Write(bytes)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
 
 func (v Value) Marshal() []byte {
 	switch v.typ {
@@ -44,6 +62,7 @@ func (v Value) marshalBulk() []byte {
 	bytes = append(bytes, '\r', '\n')
 	
 	return bytes 
+}
 
 // array format:
 // *<elements_count>\r\n<element_1_marshaled><element_2_marshaled>...
@@ -71,6 +90,7 @@ func (v Value) marshalError() []byte {
 	return bytes
 }
 
-func (v Value) marshallNull() []byte {
+func (v Value) marshalNull() []byte {
 	return []byte("$-1\r\n")
 }
+

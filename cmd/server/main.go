@@ -14,6 +14,7 @@ func main() {
 		fmt.Println(err)
 		return
 	}
+	defer l.Close()
 
 	// Listen for connections
 	conn, err := l.Accept()
@@ -21,11 +22,12 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-
 	defer conn.Close()
 
+	resp := NewResp(conn)
+	writer := NewWriter(conn)
+
 	for {
-		resp := NewResp(conn)
 		value, err := resp.Read()
 		if err != nil {
 			fmt.Println(err)
@@ -34,7 +36,10 @@ func main() {
 
 		fmt.Println(value)
 
-		// ignore request and send back a PONG
-		conn.Write([]byte("+OK\r\n"))
+		// Temporary smoke response until command handlers are wired up
+		if err := writer.Write(Value{typ: "string", str: "OK"}); err != nil {
+			fmt.Println(err)
+			return
+		}
 	}
 }
