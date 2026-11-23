@@ -1,6 +1,10 @@
 package main
 
-import "strconv"
+import (
+	"strconv"
+
+	"golang.org/x/tools/go/analysis/passes/appends"
+)
 
 func (v Value) Marshal() []byte {
 	switch v.typ {
@@ -55,4 +59,17 @@ func (v Value) marshalArray() []byte {
 		bytes = append(bytes, v.array[i].Marshal()...)
 	}
 	return bytes
+}
+
+func (v Value) marshalError() []byte {
+	var bytes []byte
+	// ERROR - const
+	bytes = append(bytes, ERROR)
+	bytes = append(bytes, v.str...)
+	bytes = append(bytes, '\r', '\n')
+	return bytes
+}
+
+func (v Value) marshallNull() []byte {
+	return []byte("$-1\r\n")
 }
