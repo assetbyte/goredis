@@ -42,7 +42,8 @@ func (v Value) marshalBulk() []byte {
 	bytes = append(bytes, '\r', '\n')
 	bytes = append(bytes, v.bulk...)
 	bytes = append(bytes, '\r', '\n')
-}
+	
+	return bytes 
 
 // array format:
 // *<elements_count>\r\n<element_1_marshaled><element_2_marshaled>...
