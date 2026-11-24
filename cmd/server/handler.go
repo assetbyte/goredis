@@ -1,5 +1,10 @@
 package main
 
+import (
+	"fmt"
+	"sync"
+)
+
 var Handlers = map[string]func([]Value) Value{
 	"PING": ping,
 }
@@ -9,4 +14,21 @@ func ping(args []Value) Value {
 		return Value{typ: "string", str: "PONG"}
 	}
 	return Value{typ: "string", str: args[0].bulk}
+}
+
+var SETs = map[string]string{}
+var SETsMU = sync.RWMutex{}
+
+func set(args []Value) Value {
+	if len(args) != 2 {
+		return Value{typ: "error", str: "ERR wrong number of arguments for 'set' command"} // SET command takes exactly 2 argumants 
+	}
+
+	key := args[0].bulk
+	value := args[1].bulk
+
+	SETsMU.Lock()
+	SETs[key] = value
+	SETsMU.Unlock()
+	return Value{typ: "string", str: "OK"}
 }
