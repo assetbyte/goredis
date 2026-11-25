@@ -1,8 +1,7 @@
 package main
 
 import (
-	"fmt"
-	"hash"
+	
 	"sync"
 )
 
@@ -12,6 +11,7 @@ var Handlers = map[string]func([]Value) Value{
 	"GET": get,
 	"HSET": hset,
 	"HGET": hget,
+	"HGETALL": hgetall,
 
 }
 
@@ -90,7 +90,7 @@ func hget (args []Value) Value {
 	HSETsMU.RLock()
 	value, ok := HSETs[hash][key]
 	HSETsMU.RUnlock()
-	
+
 	if !ok {
 		return Value{typ: "null"}
 	}
