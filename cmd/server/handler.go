@@ -10,6 +10,9 @@ var Handlers = map[string]func([]Value) Value{
 	"PING": ping,
 	"SET": set,
 	"GET": get,
+	"HSET": hset,
+	"HGET": hget,
+	
 }
 
 func ping(args []Value) Value {
@@ -92,3 +95,5 @@ func hget (args []Value) Value {
 	return Value{typ: "bulk", bulk: value}
 
 }
+
+func 
