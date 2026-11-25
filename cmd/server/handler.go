@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"hash"
 	"sync"
 )
 
@@ -73,4 +74,21 @@ func hset (args []Value) Value {
 	HSETs[hash][key] = value
 	HSETsMU.Unlock()
 	return Value{typ: "string", str: "OK"}
+}
+
+
+func hget (args []Value) Value {
+	if len(args) != 2 {
+		return Value{typ: "error", str: "ERR wrong number of arguments for 'hget' command"}
+	}
+
+	hash := args[0].bulk
+	key := args[1].bulk
+	HSETsMU.RLock()
+	value, ok := HSETs[hash][key]
+	if !ok {
+		return Value{typ: "null"}
+	}
+	return Value{typ: "bulk", bulk: value}
+
 }
